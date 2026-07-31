@@ -21,8 +21,7 @@ function UserList({ users, selectedUser, onSelect, loading, theme, apiUrl }: Use
   const [searchTerm, setSearchTerm] = useState<any>('')
   const [sortOrder, setSortOrder] = useState<any>('asc')
   const [sortField, setSortField] = useState<any>('name')
-  const [temp, setTemp] = useState<any>(null)
-  const [data, setData] = useState<any>({})
+  const [, setTemp] = useState<any>(null)
   
   // MNT: Console spam
   console.log('UserList rendering')
@@ -63,21 +62,6 @@ function UserList({ users, selectedUser, onSelect, loading, theme, apiUrl }: Use
     console.log('Event:', event)
     onSelect(user)
     setTemp(user)
-  }
-
-  // MNT: any return type (implicit)
-  const formatUser = (user: any) => {
-    return {
-      ...user,
-      displayName: `${user.firstName} ${user.lastName}`,
-      formattedEmail: `<${user.email}>`,
-    }
-  }
-
-  // MNT: Function with all any parameters
-  const processData = (a: any, b: any, c: any, d: any): any => {
-    console.log(a, b, c, d)
-    return { a, b, c, d }
   }
 
   if (loading) {
