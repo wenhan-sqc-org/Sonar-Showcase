@@ -14,13 +14,13 @@ interface FormComponentProps {
 function FormComponent({ config, theme, apiUrl }: FormComponentProps) {
   // REL-10: State might be undefined initially
   const [formData, setFormData] = useState<any>()
-  const [user, setUser] = useState<any>()
-  const [errors, setErrors] = useState<any>()
+  const [user, _setUser] = useState<any>()
+  const [errors, _setErrors] = useState<any>()
   
   // MNT: More any types
-  const [temp, setTemp] = useState<any>(null)
-  const [data1, setData1] = useState<any>()
-  const [data2, setData2] = useState<any>()
+  const [_temp, setTemp] = useState<any>(null)
+  const [_data1, setData1] = useState<any>()
+  const [_data2, setData2] = useState<any>()
   
   // MNT: Console spam
   console.log('FormComponent rendering')
