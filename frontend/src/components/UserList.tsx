@@ -21,7 +21,6 @@ function UserList({ users, selectedUser, onSelect, loading, theme, apiUrl }: Use
   const [searchTerm, setSearchTerm] = useState<any>('')
   const [sortOrder, setSortOrder] = useState<any>('asc')
   const [sortField, setSortField] = useState<any>('name')
-  const [temp, setTemp] = useState<any>(null)
   const [data, setData] = useState<any>({})
   
   // MNT: Console spam
@@ -62,7 +61,6 @@ function UserList({ users, selectedUser, onSelect, loading, theme, apiUrl }: Use
     console.log('User clicked:', user)
     console.log('Event:', event)
     onSelect(user)
-    setTemp(user)
   }
 
   // MNT: any return type (implicit)

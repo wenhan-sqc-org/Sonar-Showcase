@@ -46,7 +46,7 @@ function Dashboard(props: DashboardProps) {
   // MNT: More any types
   const [data, setData] = useState<any>(null)
   const [stats, setStats] = useState<any>({})
-  const [temp, setTemp] = useState<any>(null)
+  const [_temp, setTemp] = useState<any>(null)
   
   // MNT: Console.log spam
   console.log('Dashboard rendering')
@@ -100,9 +100,6 @@ function Dashboard(props: DashboardProps) {
     setTemp(x)
   }
 
-  // MNT: Unused variable
-  const unusedVar = 'this is never used'
-
   if (loading) {
     return <div className="loading">Loading...</div>
   }
@@ -130,8 +127,8 @@ function Dashboard(props: DashboardProps) {
       
       {/* MNT: Rendering without proper checks */}
       <ul>
-        {(users || []).map((user: any, index: any) => (
-          <li key={index} onClick={() => props.onHandleStuff(user)}>
+        {(users || []).map((user: any) => (
+          <li key={user.id} role="button" onClick={() => props.onHandleStuff(user)}>
             {user.username} - {user.email}
           </li>
         ))}
