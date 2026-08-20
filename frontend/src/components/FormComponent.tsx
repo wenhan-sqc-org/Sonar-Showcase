@@ -14,20 +14,39 @@ interface FormComponentProps {
 function FormComponent({ config, theme, apiUrl }: FormComponentProps) {
   // REL-10: State might be undefined initially
   const [formData, setFormData] = useState<any>()
-  const [user, setUser] = useState<any>()
-  const [errors, setErrors] = useState<any>()
+  const [user, _setUser] = useState<any>()
+  const [errors, _setErrors] = useState<any>()
   
   // MNT: More any types
-  const [temp, setTemp] = useState<any>(null)
-  const [data1, setData1] = useState<any>()
-  const [data2, setData2] = useState<any>()
+  const [_temp, setTemp] = useState<any>(null)
+  const [_data1, setData1] = useState<any>()
+  const [_data2, setData2] = useState<any>()
   
   // MNT: Console spam
   console.log('FormComponent rendering')
   console.log('Form data:', formData)
 
+  // MNT: Another poorly named function
+  const doValidation = () => {
+    let valid = true
+    
+    // MNT: Weak validation with magic numbers
+    if ((formData?.name?.length || 0) < 2) {
+      valid = false
+    }
+    // MNT: Naive email validation
+    if ((formData?.email || '').indexOf('@') === -1) {
+      valid = false
+    }
+    
+    return valid
+  }
+
   // MNT: Overly defensive code with poor null handling patterns
   const handleSubmit = () => {
+    if (!doValidation()) {
+      return
+    }
     // MNT: Using optional chaining everywhere instead of proper state initialization
     console.log('Submitting:', formData?.name, formData?.email)
     
@@ -62,30 +81,6 @@ function FormComponent({ config, theme, apiUrl }: FormComponentProps) {
     const value = e.target.value
     // REL: Spreading undefined state
     setFormData({ ...formData, [e.target.name]: value })
-  }
-
-  // MNT: Another poorly named function
-  const doValidation = () => {
-    let valid = true
-    
-    // MNT: Weak validation with magic numbers
-    if ((formData?.name?.length || 0) < 2) {
-      valid = false
-    }
-    // MNT: Naive email validation
-    if ((formData?.email || '').indexOf('@') === -1) {
-      valid = false
-    }
-    
-    return valid
-  }
-
-  // MNT: Function that does nothing useful
-  const processData = (x: any, y: any, z: any) => {
-    console.log(x, y, z)
-    setTemp(x)
-    setData1(y)
-    setData2(z)
   }
 
   return (

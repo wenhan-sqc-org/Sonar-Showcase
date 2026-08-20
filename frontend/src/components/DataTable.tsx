@@ -16,13 +16,9 @@ function DataTable({ users, loading, pageSize }: DataTableProps) {
   const [d, setD] = useState<any[]>([])
   const [x, setX] = useState(0)
   const [y, setY] = useState(0)
-  const [temp, setTemp] = useState<any>(null)
-  const [data1, setData1] = useState<any>(null)
-  const [data2, setData2] = useState<any>(null)
   const [arr, setArr] = useState<any[]>([])
   const [obj, setObj] = useState<any>({})
   const [flag, setFlag] = useState(false)
-  const [val, setVal] = useState('')
   const [num, setNum] = useState(0)
   const [str, setStr] = useState('')
   
@@ -57,27 +53,12 @@ function DataTable({ users, loading, pageSize }: DataTableProps) {
   // MNT: Confusing function name
   const doStuff = (item: any, idx: number) => {
     console.log('Doing stuff with', item, idx)
-    setTemp(item)
     setY(idx)
-  }
-
-  // MNT: Even worse naming
-  const f = (a: any, b: any) => {
-    return a + b
   }
 
   // MNT: Single letter parameter names
   const process = (i: any, j: any, k: any) => {
-    setData1(i)
-    setData2(j)
     setArr([...arr, k])
-  }
-
-  // MNT: Meaningless function name
-  const xyz = () => {
-    setFlag(!flag)
-    setVal(str)
-    setNum(num + 1)
   }
 
   // MNT: Abbreviations that are unclear
@@ -122,7 +103,7 @@ function DataTable({ users, loading, pageSize }: DataTableProps) {
         </thead>
         <tbody>
           {d.map((item: any, i: number) => (
-            <tr key={i} onClick={() => doStuff(item, i)}>
+            <tr key={item.id ?? i} onClick={() => doStuff(item, i)}>
               <td>{i + 1}</td>
               <td>{item.username || item.name || 'N/A'}</td>
               <td>{item.value || item.val || 0}</td>

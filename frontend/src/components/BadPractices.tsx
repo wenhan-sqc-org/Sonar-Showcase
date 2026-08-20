@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * MAINT: Multiple React anti-patterns demonstrated
  */
 export const BadPractices: React.FC<any> = (props: any) => {
-    const [items, setItems] = useState<any[]>([]);
+    const [items, setItems] = useState<{ id: number; value: number }[]>([]);
     const [count, setCount] = useState(0);
+    const nextId = useRef(0);
 
     // MAINT: Missing dependency in useEffect
     useEffect(() => {
         console.log('Effect running');
         // Uses count but doesn't declare it in deps
         if (count > 0) {
-            setItems([...items, count]);
+            const id = nextId.current++;
+            setItems([...items, { id, value: count }]);
         }
     }, [items]); // Missing 'count' dependency
 
@@ -24,11 +26,11 @@ export const BadPractices: React.FC<any> = (props: any) => {
     return (
         <div>
             {/* MAINT: Array index as key (anti-pattern) */}
-            {items.map((item, index) => (
-                <div key={index}>
+            {items.map((item) => (
+                <div key={item.id}>
                     {/* MAINT: Inline function in JSX */}
-                    <button onClick={() => console.log(item)}>
-                        Item {item}
+                    <button onClick={() => console.log(item.value)}>
+                        Item {item.value}
                     </button>
                 </div>
             ))}
