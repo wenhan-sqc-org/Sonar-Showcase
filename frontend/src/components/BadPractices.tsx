@@ -27,7 +27,7 @@ export const BadPractices: React.FC<any> = (props: any) => {
             {items.map((item, index) => (
                 <div key={index}>
                     {/* MAINT: Inline function in JSX */}
-                    <button onClick={() => console.log(item)}>
+                    <button type="button" onClick={() => console.log(item)}>
                         Item {item}
                     </button>
                 </div>
@@ -37,9 +37,9 @@ export const BadPractices: React.FC<any> = (props: any) => {
             <img src="photo.jpg" />
 
             {/* MAINT: onClick on non-interactive element */}
-            <div onClick={handleClick}>
+            <button type="button" onClick={handleClick}>
                 Click me
-            </div>
+            </button>
 
             {/* MAINT: Poor color contrast */}
             <p style={{ color: '#ccc', background: '#ddd' }}>
@@ -50,7 +50,7 @@ export const BadPractices: React.FC<any> = (props: any) => {
             <input type="text" placeholder="Enter name" />
 
             {/* MAINT: Unnecessary state update causing re-render */}
-            <button onClick={() => setCount(count)}>
+            <button type="button" onClick={() => setCount(0)}>
                 Set to same value
             </button>
         </div>
