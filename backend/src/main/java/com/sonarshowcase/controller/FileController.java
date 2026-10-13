@@ -53,10 +53,14 @@ public class FileController {
             @Parameter(description = "Filename (vulnerable to path traversal)", example = "../../../etc/passwd")
             @RequestParam String filename) {
         try {
-            // SEC: No validation of filename - path traversal possible
-            Path filePath = Paths.get(UPLOAD_DIR + filename);
+            Path baseDir = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+            Path filePath = baseDir.resolve(filename).toAbsolutePath().normalize();
             
-            // SEC: Attacker can use: ?filename=../../../etc/passwd
+            if (!filePath.startsWith(baseDir) || filePath.equals(baseDir)) {
+                return ResponseEntity.badRequest()
+                        .body("Error: Invalid filename".getBytes());
+            }
+            
             byte[] content = Files.readAllBytes(filePath);
             
             return ResponseEntity.ok()
@@ -88,8 +92,12 @@ public class FileController {
             @Parameter(description = "File path (vulnerable to path traversal)", example = "/etc/passwd")
             @RequestParam String path) {
         try {
-            // SEC: Direct use of user input in file path
-            File file = new File(path);
+            // Resolve the path inside the upload directory and validate it
+            File baseDir = new File(UPLOAD_DIR).getCanonicalFile();
+            File file = new File(baseDir, path).getCanonicalFile();
+            if (!file.getPath().startsWith(baseDir.getPath() + File.separator)) {
+                return ResponseEntity.badRequest().body("Invalid file path");
+            }
             
             // REL: No check if file exists
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -131,7 +139,14 @@ public class FileController {
             @Parameter(description = "Filename (vulnerable to path traversal)", example = "../../../important/data.db")
             @RequestParam String filename) {
         // SEC: User can delete any file: ?filename=../../../important/data.db
-        File file = new File(UPLOAD_DIR + filename);
+        Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+        Path targetPath = basePath.resolve(filename).toAbsolutePath().normalize();
+        
+        if (!targetPath.startsWith(basePath) || targetPath.equals(basePath)) {
+            return ResponseEntity.badRequest().body("Invalid filename");
+        }
+        
+        File file = targetPath.toFile();
         
         if (file.delete()) {
             return ResponseEntity.ok("Deleted: " + filename);
@@ -190,11 +205,13 @@ public class FileController {
             @RequestParam String username) {
         // SEC: Path Traversal - S2083
         // Attacker can use: ?username=../../../etc/passwd
-        String profilePath = "/var/profiles/" + username + ".json";
+        Path profilesDir = Paths.get("/var/profiles/").toAbsolutePath().normalize();
         
         try {
-            Path path = Paths.get(profilePath);
-            // SEC: No canonicalization check - allows ../ sequences
+            Path path = profilesDir.resolve(username + ".json").normalize();
+            if (!path.startsWith(profilesDir) || path.equals(profilesDir)) {
+                return ResponseEntity.badRequest().build();
+            }
             String content = new String(Files.readAllBytes(path));
             return ResponseEntity.ok(content);
         } catch (IOException e) {
@@ -222,12 +239,15 @@ public class FileController {
     public ResponseEntity<String> getLogs(
             @Parameter(description = "Date (vulnerable to path traversal)", example = "2024-01-01/../../../../etc/shadow")
             @RequestParam String date) {
-        // SEC: Path Traversal - date parameter is not validated
-        String logPath = "/var/logs/app/" + date + ".log";
+        String logDir = "/var/logs/app/";
+        String logPath = logDir + date + ".log";
         
         try {
             File logFile = new File(logPath);
-            // SEC: No check if resolved path is within allowed directory
+            String canonicalLogDir = new File(logDir).getCanonicalPath() + File.separator;
+            if (!logFile.getCanonicalPath().startsWith(canonicalLogDir)) {
+                return ResponseEntity.status(400).body("Invalid log date");
+            }
             BufferedReader reader = new BufferedReader(new FileReader(logFile));
             StringBuilder content = new StringBuilder();
             String line;
@@ -266,13 +286,16 @@ public class FileController {
             @Parameter(description = "Data to write")
             @RequestBody String data) {
         
-        // SEC: Path Traversal in write operation - CRITICAL
-        // Attacker can write to any location: ?filename=../../../root/.ssh/authorized_keys
-        String exportPath = UPLOAD_DIR + filename;
+        // Normalize the target path and make sure it stays inside the upload directory
+        Path baseDir = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+        Path exportPath = baseDir.resolve(filename).normalize();
+        
+        if (!exportPath.startsWith(baseDir) || exportPath.equals(baseDir)) {
+            return ResponseEntity.badRequest().body("Invalid filename");
+        }
         
         try {
-            // SEC: No validation of filename - can contain ../
-            Files.write(Paths.get(exportPath), data.getBytes());
+            Files.write(exportPath, data.getBytes());
             return ResponseEntity.ok("Exported to: " + exportPath);
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Export failed: " + e.getMessage());
@@ -302,7 +325,12 @@ public class FileController {
             @RequestParam String name) {
         // SEC: Path Traversal - template name not sanitized
         String templateDir = "/var/templates/";
-        Path templatePath = Paths.get(templateDir, name + ".html");
+        Path baseDir = Paths.get(templateDir).toAbsolutePath().normalize();
+        Path templatePath = baseDir.resolve(name + ".html").normalize();
+        
+        if (!templatePath.startsWith(baseDir)) {
+            return ResponseEntity.badRequest().body("Invalid template name");
+        }
         
         try {
             // SEC: User-controlled path without validation
