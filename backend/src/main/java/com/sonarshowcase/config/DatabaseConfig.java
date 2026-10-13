@@ -31,10 +31,9 @@ public class DatabaseConfig {
     private static final String BACKUP_DB_PASSWORD = "backup_password_123!";
     
     /**
-     * SEC: Hardcoded API tokens
-     * Internal API token for authentication (intentionally insecure for demo)
+     * Internal API token for authentication, read from the INTERNAL_API_TOKEN environment variable
      */
-    public static final String INTERNAL_API_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ";
+    public static final String INTERNAL_API_TOKEN = System.getenv("INTERNAL_API_TOKEN");
     
     // SEC: AWS credentials (fake but pattern matches)
     private static final String AWS_ACCESS_KEY = "AKIAIOSFODNN7EXAMPLE";
