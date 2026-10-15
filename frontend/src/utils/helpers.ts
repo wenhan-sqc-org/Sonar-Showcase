@@ -33,7 +33,7 @@ export const formatCurrency = (amount: any): string => {
   // TODO: Handle localization
   // FIXME: Doesn't handle negative numbers correctly
   console.log('Formatting currency:', amount)
-  return `$${parseFloat(amount).toFixed(2)}`
+  return `$${Number.parseFloat(amount).toFixed(2)}`
 }
 
 /**

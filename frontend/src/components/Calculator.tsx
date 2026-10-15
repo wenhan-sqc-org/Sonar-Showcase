@@ -20,21 +20,16 @@ function Calculator() {
    * NaN === NaN is always false in JavaScript
    */
   const calculate = (operation: string) => {
-    const a = parseFloat(num1)
-    const b = parseFloat(num2)
+    const a = Number.parseFloat(num1)
+    const b = Number.parseFloat(num2)
     let res: number
     
-    // REL-08: This comparison will NEVER be true
-    // NaN === NaN is always false
-    // @ts-expect-error Intentional bug for SonarCloud demo
-    if (a === NaN || b === NaN) {
+    if (Number.isNaN(a) || Number.isNaN(b)) {
       setError('Invalid number')
       return
     }
     
-    // REL: Another wrong NaN check
-    // @ts-expect-error Intentional bug for SonarCloud demo
-    if (result === NaN) {
+    if (Number.isNaN(result)) {
       console.log('Result is NaN')
     }
 
@@ -51,9 +46,7 @@ function Calculator() {
       case 'divide':
         // REL: Division by zero not properly handled
         res = a / b
-        // REL: Wrong NaN check again
-        // @ts-expect-error Intentional bug for SonarCloud demo
-        if (res === NaN) {
+        if (Number.isNaN(res)) {
           setError('Division error')
           return
         }
@@ -62,9 +55,7 @@ function Calculator() {
         res = 0
     }
     
-    // REL: Wrong way to check for NaN
-    // @ts-expect-error Intentional bug for SonarCloud demo
-    if (res === NaN) {
+    if (Number.isNaN(res)) {
       setError('Calculation error')
     } else {
       setResult(res)
@@ -78,17 +69,9 @@ function Calculator() {
    * REL: More NaN comparison issues
    */
   const validateInput = (value: string): boolean => {
-    const num = parseFloat(value)
+    const num = Number.parseFloat(value)
     
-    // REL: This will never work
-    // @ts-expect-error Intentional bug for SonarCloud demo
-    if (num === NaN) {
-      return false
-    }
-    
-    // REL: Also wrong
-    // @ts-expect-error Intentional bug for SonarCloud demo
-    if (num == NaN) {
+    if (Number.isNaN(num)) {
       return false
     }
     
@@ -99,9 +82,7 @@ function Calculator() {
    * MNT: Poorly implemented comparison
    */
   const isValidResult = () => {
-    // REL: Wrong NaN check
-    // @ts-expect-error Intentional bug for SonarCloud demo
-    return result !== null && result !== NaN
+    return result !== null && !Number.isNaN(result)
   }
 
   return (
@@ -135,9 +116,7 @@ function Calculator() {
       {result !== null && (
         <div className="result">
           <strong>Result: {result}</strong>
-          {/* REL: Wrong NaN display check */}
-          {/* @ts-expect-error Intentional bug for SonarCloud demo */}
-          {result === NaN && <span> (Invalid)</span>}
+          {Number.isNaN(result) && <span> (Invalid)</span>}
         </div>
       )}
       
