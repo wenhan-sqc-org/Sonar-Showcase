@@ -53,10 +53,14 @@ public class FileController {
             @Parameter(description = "Filename (vulnerable to path traversal)", example = "../../../etc/passwd")
             @RequestParam String filename) {
         try {
-            // SEC: No validation of filename - path traversal possible
-            Path filePath = Paths.get(UPLOAD_DIR + filename);
+            Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+            Path filePath = Paths.get(UPLOAD_DIR + filename).toAbsolutePath().normalize();
             
-            // SEC: Attacker can use: ?filename=../../../etc/passwd
+            if (!filePath.startsWith(basePath)) {
+                return ResponseEntity.badRequest()
+                        .body("Error: Invalid file path".getBytes());
+            }
+            
             byte[] content = Files.readAllBytes(filePath);
             
             return ResponseEntity.ok()
@@ -88,8 +92,13 @@ public class FileController {
             @Parameter(description = "File path (vulnerable to path traversal)", example = "/etc/passwd")
             @RequestParam String path) {
         try {
-            // SEC: Direct use of user input in file path
-            File file = new File(path);
+            // Resolve the user-supplied path against the upload directory and validate it
+            Path basePath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+            Path resolvedPath = basePath.resolve(path).toAbsolutePath().normalize();
+            if (!resolvedPath.startsWith(basePath)) {
+                return ResponseEntity.status(403).body("Access denied: path is outside of the allowed directory");
+            }
+            File file = resolvedPath.toFile();
             
             // REL: No check if file exists
             BufferedReader reader = new BufferedReader(new FileReader(file));
