@@ -52,6 +52,10 @@ Desktop.ini
 # ---- Local files
 local/
 
+# ---- Secrets / private keys (must be supplied via secret store or env vars)
+*.pem
+*.key
+
 # ---- Maven wrapper
 .mvn/.develocity/
 
